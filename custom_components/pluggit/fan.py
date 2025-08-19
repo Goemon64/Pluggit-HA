@@ -55,6 +55,7 @@ class PluggitFan(FanEntity):
         SpeedLevelFan.LEVEL_4,
     ]
     SUPPORTED_PRESET_MODES = [
+        CURRENT_UNIT_MODE[1],
         CURRENT_UNIT_MODE[2],
         CURRENT_UNIT_MODE[3],
         CURRENT_UNIT_MODE[5],
@@ -92,7 +93,7 @@ class PluggitFan(FanEntity):
         if speed is not None:
             time.sleep(100 / 1000)
             ret = self._pluggit.get_current_unit_mode()
-            if ret == CURRENT_UNIT_MODE[1]:
+            if ret == CURRENT_UNIT_MODE[1] or CURRENT_UNIT_MODE[6]:
                 self._pluggit.set_speed_level(speed=speed)
 
     @property
@@ -131,7 +132,9 @@ class PluggitFan(FanEntity):
         """Set preset mode."""
 
         mode = None
-        if preset_mode == CURRENT_UNIT_MODE[2]:
+        if preset_mode == CURRENT_UNIT_MODE[1]:
+            mode = ActiveUnitMode.MANUAL_MODE
+        elif preset_mode == CURRENT_UNIT_MODE[2]:
             mode = ActiveUnitMode.DEMAND_MODE
         elif preset_mode == CURRENT_UNIT_MODE[3]:
             mode = ActiveUnitMode.WEEK_PROGRAM_MODE
@@ -148,14 +151,17 @@ class PluggitFan(FanEntity):
 
     def set_percentage(self, percentage: int) -> None:
         """Set fan speed in percentage."""
-
+        active_mode = ActiveUnitMode.MANUAL_MODE
         named_speed = percentage_to_ordered_list_item(
             self.ORDERED_NAMED_FAN_SPEEDS, percentage
         )
         if percentage == 0:
             named_speed = SpeedLevelFan.LEVEL_0
 
-        self.__set_unit_mode(mode=ActiveUnitMode.MANUAL_MODE, speed=named_speed)
+        if self._currentMode == CURRENT_UNIT_MODE[6]:
+            active_mode = ActiveUnitMode.SUMMER_MODE
+
+        self.__set_unit_mode(mode=active_mode, speed=named_speed)
 
     @property
     def icon(self) -> str | None:
