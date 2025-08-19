@@ -89,6 +89,7 @@
                     "preset_mode": {
                         "state": {
                             "Demand": "Demand",
+                            "Manual": "Manual",
                             "Week Program": "Week Program",
                             "Away": "Away",
                             "Summer": "Summer",
