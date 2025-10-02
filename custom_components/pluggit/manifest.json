@@ -1,11 +1,11 @@
 {
     "domain": "pluggit",
     "name": "Pluggit",
-    "version": "1.8.1",
+    "version": "1.8.2",
     "codeowners": ["@Goemon64"],
     "config_flow": true,
     "documentation": "https://github.com/Goemon64/Pluggit-HA",
     "integration_type": "device",
     "iot_class": "local_polling",
-    "requirements": ["pymodbus==3.11.1"]
+    "requirements": ["pymodbus==3.11.2"]
 }
