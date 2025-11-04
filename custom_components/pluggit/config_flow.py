@@ -42,6 +42,7 @@ class PluggitConfigFlow(ConfigFlow, domain=DOMAIN):
             errors[CONFIG_HOST] = "No valid host or connection!"
             if ret is not None:
                 user_input[SERIAL_NUMBER] = ret
+                await self.async_set_unique_id(str(ret))
                 return self.async_create_entry(title="Pluggit", data=user_input)
 
         return self.async_show_form(

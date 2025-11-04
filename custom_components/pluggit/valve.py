@@ -42,7 +42,7 @@ class PluggitValve(ValveEntity):
         """Initialise Pluggit valve."""
         self._pluggit = pluggit
         self._serial_number = str(serial_number)
-        self._attr_unique_id = "manual_bypass"
+        self._attr_unique_id = f"{serial_number}_manual_bypass"
         self._attr_translation_key = "manual_bypass"
         self._attr_has_entity_name = True
         self._attr_available = False

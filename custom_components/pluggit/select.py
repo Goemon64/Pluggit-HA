@@ -56,7 +56,7 @@ class PluggitSelect(SelectEntity):
         """Initialise Pluggit sensor."""
         self._pluggit = pluggit
         self._serial_number = str(serial_number)
-        self._attr_unique_id = "week_program"
+        self._attr_unique_id = f"{serial_number}_week_program"
         self._attr_translation_key = "select_week"
         self._attr_current_option = None
         self._attr_entity_category = EntityCategory.CONFIG

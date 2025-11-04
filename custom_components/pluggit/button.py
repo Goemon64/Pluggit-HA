@@ -79,7 +79,7 @@ class PluggitButton(ButtonEntity):
         self._pluggit = pluggit
         self.entity_description = description
         self._serial_number = str(serial_number)
-        self._attr_unique_id = description.key
+        self._attr_unique_id = f"{serial_number}_{description.key}"
         self._attr_entity_category = EntityCategory.CONFIG
         self._attr_has_entity_name = True
         self._attr_available = False
