@@ -13,7 +13,7 @@ from .pypluggit.pluggit import Pluggit
 _LOGGER = logging.getLogger(__name__)
 
 
-async def validate_input(data: dict[str, Any]) -> str:
+async def _validate_input(data: dict[str, Any]) -> str:
     """Check for Host and try to get serial number."""
 
     host = data[CONFIG_HOST]
@@ -34,36 +34,54 @@ class PluggitConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Show form and get host address."""
-        errors = {}
-
-        if user_input is not None:
-            ret = await validate_input(user_input)
-            errors[CONFIG_HOST] = "No valid host or connection!"
-            if ret is not None:
-                user_input[SERIAL_NUMBER] = ret
-                return self.async_create_entry(title="Pluggit", data=user_input)
-
-        return self.async_show_form(
-            step_id="user", data_schema=self.STEP_USER_DATA_SCHEMA, errors=errors
-        )
+        """Step for initially adding a device."""
+        return await self._async_handle_step(user_input, step_id="user")
 
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Show form for reconfigure host address."""
-        errors = {}
+        """Step for reconfiguring an existing device."""
+        return await self._async_handle_step(user_input, step_id="reconfigure")
+
+    async def _async_handle_step(
+        self, user_input: dict[str, Any] | None, step_id: str
+    ) -> ConfigFlowResult:
+        """Shared logic for both User and Reconfigure steps."""
+        errors: dict[str, str] = {}
 
         if user_input is not None:
-            ret = await validate_input(user_input)
-            errors[CONFIG_HOST] = "No valid host or connection!"
-            if ret is not None:
-                user_input[SERIAL_NUMBER] = ret
-                return self.async_update_reload_and_abort(
-                    self._get_reconfigure_entry(),
-                    data_updates=user_input,
+            # Validate the device
+            ret = await _validate_input(user_input)
+            if ret is None:
+                errors[CONFIG_HOST] = "invalid_host"
+                return self.async_show_form(
+                    step_id=step_id,
+                    data_schema=self.STEP_USER_DATA_SCHEMA,
+                    errors=errors,
                 )
 
+            # Set the unique ID based on the device serial number
+            await self.async_set_unique_id(str(ret))
+            user_input[SERIAL_NUMBER] = ret
+
+            # Check if a config entry with this unique ID already exists
+            existing_entry = None
+            for entry in self.hass.config_entries.async_entries(DOMAIN):
+                if entry.unique_id == str(ret):
+                    existing_entry = entry
+                    break
+            if existing_entry:
+                # Update the existing entry & reload
+                self.hass.config_entries.async_update_entry(
+                    existing_entry, data=user_input
+                )
+                await self.hass.config_entries.async_reload(existing_entry.entry_id)
+                return self.async_abort(reason="reconfigured")
+
+            # No existing entry → create a new config entry
+            return self.async_create_entry(title=f"Pluggit {ret}", data=user_input)
+
+        # Show the form if no input has been provided yet
         return self.async_show_form(
-            step_id="reconfigure", data_schema=self.STEP_USER_DATA_SCHEMA, errors=errors
+            step_id=step_id, data_schema=self.STEP_USER_DATA_SCHEMA, errors=errors
         )
