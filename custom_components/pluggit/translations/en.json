@@ -6,6 +6,12 @@
                     "host": "Host"
                 }
             }
+        },
+        "abort": {
+            "reconfigured": "The device was already set up and was reconfigured."
+        },
+        "error": {
+            "invalid_host": "No valid host or connection!"
         }
     },
     "entity": {

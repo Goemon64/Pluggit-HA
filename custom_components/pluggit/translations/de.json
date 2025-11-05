@@ -6,6 +6,12 @@
                     "host": "Host"
                 }
             }
+        },
+        "abort": {
+            "reconfigured": "Das Gerät war bereits eingerichtet und wurde neu konfiguriert."
+        },
+        "error": {
+            "invalid_host": "Kein gültiger Host oder Verbindung!"
         }
     },
     "entity": {
