@@ -1,7 +1,7 @@
 {
     "domain": "pluggit",
     "name": "Pluggit",
-    "version": "1.8.2",
+    "version": "1.9.0",
     "codeowners": ["@Goemon64"],
     "config_flow": true,
     "documentation": "https://github.com/Goemon64/Pluggit-HA",
