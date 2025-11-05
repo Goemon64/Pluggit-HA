@@ -68,7 +68,7 @@ class PluggitFan(FanEntity):
         self._pluggit = pluggit
         self._speedLevel = SpeedLevelFan.LEVEL_1
         self._currentMode = CURRENT_UNIT_MODE[0]
-        self._attr_unique_id = "fan"
+        self._attr_unique_id = f"{device['serial_number']}_fan"
         self._attr_available = False
         self._attr_has_entity_name = True
         self._attr_device_info = device

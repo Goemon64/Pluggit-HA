@@ -87,7 +87,7 @@ class PluggitTime(TimeEntity):
         self._pluggit = pluggit
         self.entity_description = description
         self._serial_number = str(serial_number)
-        self._attr_unique_id = description.key
+        self._attr_unique_id = f"{serial_number}_{description.key}"
         self._attr_has_entity_name = True
         self._attr_available = False
         self._attr_native_value = None
