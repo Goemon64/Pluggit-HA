@@ -5,6 +5,7 @@ from pymodbus.client import ModbusTcpClient
 from pymodbus.exceptions import ConnectionException
 
 from .const import (
+    ALARM_CODES,
     BYPASS_STATE,
     CURRENT_UNIT_MODE,
     DEGREE_OF_DIRTINESS,
@@ -200,6 +201,14 @@ class Pluggit:
     def get_night_mode_state(self) -> int | None:
         """Get state of night mode on/off."""
         return self.__read_register(register=Registers.PRM_NIGHT_MODE_STATE)
+
+    def get_last_active_alarm(self) -> str | None:
+        """Get last active alarm code."""
+        alarm = self.__read_register(register=Registers.PRM_LAST_ACTIVE_ALARM)
+
+        if alarm is not None:
+            return ALARM_CODES[alarm]
+        return None
 
     def set_date_time(self, time_seconds: int):
         """Set date and time."""
