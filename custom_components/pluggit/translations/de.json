@@ -16,6 +16,27 @@
     },
     "entity": {
         "sensor": {
+            "alarm": {
+                "name": "Aktive Alarme",
+                "state": {
+                    "None": "Kein Alarm",
+                    "Exhaust FAN Alarm": "Abluft FAN Alarm",
+                    "Supply FAN Alarm": "Zuluft FAN Alarm",
+                    "Bypass Alarm": "Bypass Alarm",
+                    "T1 Alarm": "T1 Alarm",
+                    "T2 Alarm": "T2 Alarm",
+                    "T3 Alarm": "T3 Alarm",
+                    "T4 Alarm": "T4 Alarm",
+                    "T5 Alarm": "T5 Alarm",
+                    "RH Alarm": "RH Alarm",
+                    "Outdoor13 Alarm": "T1 Frischluft Alarm",
+                    "Supply5 Alarm": "T2 Zuluft Alarm",
+                    "Fire Alarm": "Feuer Alarm",
+                    "Communication Alarm": "Kommunikationsfehler",
+                    "FireTermonstat Alarm": "Feuerthermostat Alarm",
+                    "High waterlevel Alarm": "Hoher Wasserstand Alarm"
+                }
+            },
             "t1_outdoor": {
                 "name": "T1 Frischluft"
             },

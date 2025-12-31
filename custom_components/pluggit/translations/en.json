@@ -66,6 +66,27 @@
             }
         },
         "sensor": {
+            "alarm": {
+                "name": "Active Alarm",
+                "state": {
+                    "None": "None",
+                    "Exhaust FAN Alarm": "Exhaust FAN Alarm",
+                    "Supply FAN Alarm": "Supply FAN Alarm",
+                    "Bypass Alarm": "Bypass Alarm",
+                    "T1 Alarm": "T1 Alarm",
+                    "T2 Alarm": "T2 Alarm",
+                    "T3 Alarm": "T3 Alarm",
+                    "T4 Alarm": "T4 Alarm",
+                    "T5 Alarm": "T5 Alarm",
+                    "RH Alarm": "RH Alarm",
+                    "Outdoor13 Alarm": "Outdoor13 Alarm",
+                    "Supply5 Alarm": "Supply5 Alarm",
+                    "Fire Alarm": "Fire Alarm",
+                    "Communication Alarm": "Communication Alarm",
+                    "FireTermonstat Alarm": "Fire thermostat Alarm",
+                    "High waterlevel Alarm": "High waterlevel Alarm"
+                }
+            },
             "bypass_state": {
                 "name": "Bypass state",
                 "state": {
