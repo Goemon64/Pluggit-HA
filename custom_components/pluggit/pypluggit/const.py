@@ -42,6 +42,7 @@ class Registers(Enum):
     PRM_ROM_IDX_NIGHT_MODE_END_MIN = auto()
     PRM_VOC = auto()
     PRM_RAM_IDX_RH3_CORRECTED = auto()
+    PRM_LAST_ACTIVE_ALARM = auto()
 
 
 class Components(Enum):
@@ -146,6 +147,25 @@ BYPASS_STATE = {
     255: "Opened",
 }
 
+ALARM_CODES = {
+    0: "None",
+    1: "Exhaust FAN Alarm",
+    2: "Supply FAN Alarm",
+    3: "Bypass Alarm",
+    4: "T1 Alarm",
+    5: "T2 Alarm",
+    6: "T3 Alarm",
+    7: "T4 Alarm",
+    8: "T5 Alarm",
+    9: "RH Alarm",
+    10: "Outdoor13 Alarm",
+    11: "Supply5 Alarm",
+    12: "Fire Alarm",
+    13: "Communication Alarm",
+    14: "FireTermonstat Alarm",
+    15: "High waterlevel Alarm",
+}
+
 REGISTER_DIC = {
     Registers.PRM_SYSTEM_ID: [2, m.DATATYPE.UINT32],
     Registers.PRM_SYSTEM_SERIAL_NUM_LOW: [4, m.DATATYPE.UINT32],
@@ -181,4 +201,5 @@ REGISTER_DIC = {
     Registers.PRM_ROM_IDX_NIGHT_MODE_END_HOUR: [336, m.DATATYPE.UINT32],
     Registers.PRM_ROM_IDX_NIGHT_MODE_END_MIN: [338, m.DATATYPE.UINT32],
     Registers.PRM_NIGHT_MODE_STATE: [560, m.DATATYPE.UINT32],
+    Registers.PRM_LAST_ACTIVE_ALARM: [516, m.DATATYPE.UINT32],
 }
