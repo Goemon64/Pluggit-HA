@@ -27,6 +27,7 @@ from homeassistant.util.dt import DEFAULT_TIME_ZONE, now
 
 from .const import DOMAIN, SERIAL_NUMBER
 from .pypluggit.pluggit import (
+    ALARM_CODES,
     BYPASS_STATE,
     CURRENT_UNIT_MODE,
     DEGREE_OF_DIRTINESS,
@@ -200,6 +201,16 @@ SENSORS: tuple[PluggitSensorEntityDescription, ...] = (
         suggested_display_precision=0,
         entity_registry_enabled_default=False,
         value_fn=lambda device: device.get_fan_speed_2(),
+        icon_fn=None,
+    ),
+    PluggitSensorEntityDescription(
+        key="alarm_state",
+        translation_key="alarm",
+        device_class=SensorDeviceClass.ENUM,
+        options=list(ALARM_CODES.values()),
+        icon="mdi:alarm-light",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda device: device.get_last_active_alarm(),
         icon_fn=None,
     ),
 )
