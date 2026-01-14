@@ -17,24 +17,24 @@
     "entity": {
         "sensor": {
             "alarm": {
-                "name": "Aktive Alarme",
+                "name": "Aktiver Alarm",
                 "state": {
-                    "None": "Kein Alarm",
-                    "Exhaust FAN Alarm": "Abluft FAN Alarm",
-                    "Supply FAN Alarm": "Zuluft FAN Alarm",
-                    "Bypass Alarm": "Bypass Alarm",
-                    "T1 Alarm": "T1 Alarm",
-                    "T2 Alarm": "T2 Alarm",
-                    "T3 Alarm": "T3 Alarm",
-                    "T4 Alarm": "T4 Alarm",
-                    "T5 Alarm": "T5 Alarm",
-                    "RH Alarm": "RH Alarm",
-                    "Outdoor13 Alarm": "T1 Frischluft Alarm",
-                    "Supply5 Alarm": "T2 Zuluft Alarm",
-                    "Fire Alarm": "Feuer Alarm",
-                    "Communication Alarm": "Kommunikationsfehler",
-                    "FireTermonstat Alarm": "Feuerthermostat Alarm",
-                    "High waterlevel Alarm": "Hoher Wasserstand Alarm"
+                    "NONE": "Kein Alarm",
+                    "EXHAUST_FAN_ALARM": "Abluft FAN Alarm",
+                    "SUPPLY_FAN_ALARM": "Zuluft FAN Alarm",
+                    "BYPASS_ALARM": "Bypass Alarm",
+                    "T1_ALARM": "T1 Alarm",
+                    "T2_ALARM": "T2 Alarm",
+                    "T3_ALARM": "T3 Alarm",
+                    "T4_ALARM": "T4 Alarm",
+                    "T5_ALARM": "T5 Alarm",
+                    "RH_ALARM": "RH Alarm",
+                    "OUTDOOR13_ALARM": "T1 Frischluft Alarm",
+                    "SUPPLY_5_ALARM": "T2 Zuluft Alarm",
+                    "FIRE_ALARM": "Feuer Alarm",
+                    "COMMUNICATION_ALARM": "Kommunikationsfehler",
+                    "FIRETERMONSTAT_ALARM": "Feuerthermostat Alarm",
+                    "HIGH_WATERLEVEL_ALARM": "Hoher Wasserstand Alarm"
                 }
             },
             "t1_outdoor": {
@@ -152,6 +152,9 @@
             },
             "date_time": {
                 "name": "Zeit setzen"
+            },
+            "reset_alarm": {
+                "name": "Alarm zurücksetzen"
             }
         },
         "switch": {
