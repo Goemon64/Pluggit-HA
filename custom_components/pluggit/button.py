@@ -29,12 +29,22 @@ BUTTONS: tuple[PluggitButtonEntityDescription, ...] = (
     PluggitButtonEntityDescription(
         key="filter_reset",
         translation_key="filter_reset",
+        entity_category=EntityCategory.CONFIG,
         set_fn=lambda device: device.reset_filter(),
     ),
     PluggitButtonEntityDescription(
         key="date_time",
         translation_key="date_time",
+        entity_category=EntityCategory.CONFIG,
         set_fn=lambda device: device.set_date_time(help_time()),
+    ),
+    PluggitButtonEntityDescription(
+        key="reset_alarm",
+        translation_key="reset_alarm",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        set_fn=lambda device: device.set_alarm_acknowledge(
+            device.get_last_active_alarm()
+        ),
     ),
 )
 
@@ -80,7 +90,6 @@ class PluggitButton(ButtonEntity):
         self.entity_description = description
         self._serial_number = str(serial_number)
         self._attr_unique_id = f"{serial_number}_{description.key}"
-        self._attr_entity_category = EntityCategory.CONFIG
         self._attr_has_entity_name = True
         self._attr_available = False
         self._attr_device_info = DeviceInfo(
