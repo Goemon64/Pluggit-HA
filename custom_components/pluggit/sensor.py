@@ -27,10 +27,10 @@ from homeassistant.util.dt import DEFAULT_TIME_ZONE, now
 
 from .const import DOMAIN, SERIAL_NUMBER
 from .pypluggit.pluggit import (
-    ALARM_CODES,
     BYPASS_STATE,
     CURRENT_UNIT_MODE,
     DEGREE_OF_DIRTINESS,
+    Alarm,
     Pluggit,
     SpeedLevelFan,
 )
@@ -151,7 +151,7 @@ SENSORS: tuple[PluggitSensorEntityDescription, ...] = (
         key="get_spped_level",
         translation_key="speed_level",
         device_class=SensorDeviceClass.ENUM,
-        options=[e.value for e in SpeedLevelFan],
+        options=[val.value for val in SpeedLevelFan],
         entity_registry_enabled_default=False,
         icon="mdi:fan",
         value_fn=lambda device: device.get_speed_level(),
@@ -207,10 +207,10 @@ SENSORS: tuple[PluggitSensorEntityDescription, ...] = (
         key="alarm_state",
         translation_key="alarm",
         device_class=SensorDeviceClass.ENUM,
-        options=list(ALARM_CODES.values()),
+        options=[val.name for val in Alarm],
         icon="mdi:alarm-light",
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda device: device.get_last_active_alarm(),
+        value_fn=lambda device: getattr(device.get_last_active_alarm(), "name", None),
         icon_fn=None,
     ),
 )
