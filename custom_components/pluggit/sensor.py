@@ -13,9 +13,10 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
+    REVOLUTIONS_PER_MINUTE,
     EntityCategory,
+    UnitOfRatio,
     UnitOfTemperature,
     UnitOfTime,
 )
@@ -25,7 +26,8 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, now
 
-from .const import DOMAIN, SERIAL_NUMBER
+from .__init__ import PluggitData
+from .const import DOMAIN
 from .pypluggit.pluggit import (
     BYPASS_STATE,
     CURRENT_UNIT_MODE,
@@ -172,7 +174,7 @@ SENSORS: tuple[PluggitSensorEntityDescription, ...] = (
         key="get_voc",
         translation_key="voc",
         device_class=SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS_PARTS,
-        native_unit_of_measurement=CONCENTRATION_PARTS_PER_MILLION,
+        native_unit_of_measurement=UnitOfRatio.PARTS_PER_MILLION,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=0,
         entity_registry_enabled_default=False,
@@ -183,7 +185,7 @@ SENSORS: tuple[PluggitSensorEntityDescription, ...] = (
         key="get_fan_1",
         translation_key="fan1",
         device_class=None,
-        native_unit_of_measurement="rpm",
+        native_unit_of_measurement=REVOLUTIONS_PER_MINUTE,
         icon="mdi:fan",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=0,
@@ -195,7 +197,7 @@ SENSORS: tuple[PluggitSensorEntityDescription, ...] = (
         key="get_fan_2",
         translation_key="fan2",
         device_class=None,
-        native_unit_of_measurement="rpm",
+        native_unit_of_measurement=REVOLUTIONS_PER_MINUTE,
         icon="mdi:fan",
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=0,
@@ -246,15 +248,10 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up sensors from a config entry."""
-    data = hass.data[DOMAIN][entry.entry_id]
-    pluggit: Pluggit = data[DOMAIN]
-    serial_number = data[SERIAL_NUMBER]
 
     async_add_entities(
         (
-            PluggitSensor(
-                pluggit=pluggit, serial_number=serial_number, description=description
-            )
+            PluggitSensor(data=entry.runtime_data, description=description)
             for description in SENSORS
         ),
         update_before_add=True,
@@ -266,19 +263,17 @@ class PluggitSensor(SensorEntity):
 
     def __init__(
         self,
-        pluggit: Pluggit,
-        serial_number: int,
+        data: PluggitData,
         description: PluggitSensorEntityDescription,
     ) -> None:
         """Initialise Pluggit sensor."""
-        self._pluggit = pluggit
+        self._data = data
         self.entity_description = description
-        self._serial_number = str(serial_number)
-        self._attr_unique_id = f"{serial_number}_{description.key}"
+        self._attr_unique_id = f"{data.serial_number}_{description.key}"
         self._attr_has_entity_name = True
         self._attr_available = False
         self._attr_device_info = DeviceInfo(
-            name="Pluggit", identifiers={(DOMAIN, self._serial_number)}
+            name="Pluggit", identifiers={(DOMAIN, str(data.serial_number))}
         )
 
     @property
@@ -292,7 +287,7 @@ class PluggitSensor(SensorEntity):
     def update(self) -> None:
         """Fetch data for sensors."""
 
-        self._attr_native_value = self.entity_description.value_fn(self._pluggit)
+        self._attr_native_value = self.entity_description.value_fn(self._data.pluggit)
 
         if self._attr_native_value is None:
             self._attr_available = False

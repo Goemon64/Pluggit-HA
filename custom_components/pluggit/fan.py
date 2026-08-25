@@ -14,9 +14,9 @@ from homeassistant.util.percentage import (
     percentage_to_ordered_list_item,
 )
 
-from .const import DOMAIN, SERIAL_NUMBER
+from .__init__ import PluggitData
+from .const import DOMAIN
 from .pypluggit.const import CURRENT_UNIT_MODE, ActiveUnitMode, SpeedLevelFan
-from .pypluggit.pluggit import Pluggit
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,22 +27,8 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up fan from a config entry."""
-    data = hass.data[DOMAIN][entry.entry_id]
-    pluggit: Pluggit = data[DOMAIN]
-    serial_num = data[SERIAL_NUMBER]
 
-    device = DeviceInfo(
-        identifiers={(DOMAIN, str(serial_num))},
-        name="Pluggit",
-        manufacturer="Pluggit",
-        model=pluggit.get_unit_type(),
-        sw_version=pluggit.get_firmware_version(),
-        serial_number=serial_num,
-    )
-
-    async_add_entities(
-        [PluggitFan(pluggit=pluggit, device=device)], update_before_add=True
-    )
+    async_add_entities([PluggitFan(data=entry.runtime_data)], update_before_add=True)
 
 
 class PluggitFan(FanEntity):
@@ -63,15 +49,14 @@ class PluggitFan(FanEntity):
         CURRENT_UNIT_MODE[9],
     ]
 
-    def __init__(self, pluggit: Pluggit, device: DeviceInfo) -> None:
+    def __init__(self, data: PluggitData) -> None:
         """Initialise Ventilation."""
-        self._pluggit = pluggit
+        self._data = data
         self._speedLevel = SpeedLevelFan.LEVEL_1
         self._currentMode = CURRENT_UNIT_MODE[0]
-        self._attr_unique_id = f"{device['serial_number']}_fan"
+        self._attr_unique_id = f"{data.serial_number}_air_ventilation"
         self._attr_available = False
         self._attr_has_entity_name = True
-        self._attr_device_info = device
         self._attr_translation_key = "ventilation"
         self._attr_supported_features = (
             FanEntityFeature.PRESET_MODE
@@ -79,22 +64,30 @@ class PluggitFan(FanEntity):
             | FanEntityFeature.TURN_ON
             | FanEntityFeature.TURN_OFF
         )
+        self._attr_device_info = DeviceInfo(
+            name="Pluggit",
+            identifiers={(DOMAIN, str(data.serial_number))},
+            manufacturer="Pluggit",
+            model=data.pluggit.get_unit_type(),
+            sw_version=data.pluggit.get_firmware_version(),
+            serial_number=str(data.serial_number),
+        )
 
     def __set_unit_mode(self, mode: ActiveUnitMode, speed: SpeedLevelFan | None = None):
         if self._currentMode is not mode:
             if self._currentMode == CURRENT_UNIT_MODE[6]:
-                self._pluggit.set_unit_mode(ActiveUnitMode.END_SUMMER_MODE)
+                self._data.pluggit.set_unit_mode(ActiveUnitMode.END_SUMMER_MODE)
             elif self._currentMode == CURRENT_UNIT_MODE[9]:
-                self._pluggit.set_unit_mode(ActiveUnitMode.END_FIREPLACE_MODE)
+                self._data.pluggit.set_unit_mode(ActiveUnitMode.END_FIREPLACE_MODE)
 
             time.sleep(100 / 1000)
-            self._pluggit.set_unit_mode(mode=mode)
+            self._data.pluggit.set_unit_mode(mode=mode)
 
         if speed is not None:
             time.sleep(100 / 1000)
-            ret = self._pluggit.get_current_unit_mode()
+            ret = self._data.pluggit.get_current_unit_mode()
             if ret == CURRENT_UNIT_MODE[1] or CURRENT_UNIT_MODE[6]:
-                self._pluggit.set_speed_level(speed=speed)
+                self._data.pluggit.set_speed_level(speed=speed)
 
     @property
     def is_on(self) -> bool | None:
@@ -188,7 +181,7 @@ class PluggitFan(FanEntity):
             self.set_preset_mode(preset_mode=preset_mode)
             return
 
-        self._pluggit.set_speed_level(SpeedLevelFan.LEVEL_1)
+        self._data.pluggit.set_speed_level(SpeedLevelFan.LEVEL_1)
 
     def turn_off(self, **kwargs: Any) -> None:
         """Turn off the fan."""
@@ -202,10 +195,10 @@ class PluggitFan(FanEntity):
         # the mode on the device isn't ready. So we wait here 100ms.
         time.sleep(100 / 1000)
         try:
-            self._speedLevel = SpeedLevelFan(self._pluggit.get_speed_level())
+            self._speedLevel = SpeedLevelFan(self._data.pluggit.get_speed_level())
         except ValueError:
             self._speedLevel = None
-        self._currentMode = self._pluggit.get_current_unit_mode()
+        self._currentMode = self._data.pluggit.get_current_unit_mode()
 
         if self._speedLevel is None or self._currentMode is None:
             self._attr_available = False

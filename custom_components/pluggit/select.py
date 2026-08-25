@@ -9,8 +9,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import DOMAIN, SERIAL_NUMBER
-from .pypluggit.pluggit import Pluggit, WeekProgram
+from .__init__ import PluggitData
+from .const import DOMAIN
+from .pypluggit.pluggit import WeekProgram
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,12 +22,9 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up select."""
-    data = hass.data[DOMAIN][entry.entry_id]
-    pluggit: Pluggit = data[DOMAIN]
-    serial_number = data[SERIAL_NUMBER]
 
     async_add_entities(
-        [PluggitSelect(pluggit=pluggit, serial_number=serial_number)],
+        [PluggitSelect(data=entry.runtime_data)],
         update_before_add=True,
     )
 
@@ -48,15 +46,10 @@ class PluggitSelect(SelectEntity):
         WeekProgram.PROGRAM_11: "11",
     }
 
-    def __init__(
-        self,
-        pluggit: Pluggit,
-        serial_number: int,
-    ) -> None:
+    def __init__(self, data: PluggitData) -> None:
         """Initialise Pluggit sensor."""
-        self._pluggit = pluggit
-        self._serial_number = str(serial_number)
-        self._attr_unique_id = f"{serial_number}_week_program"
+        self._data = data
+        self._attr_unique_id = f"{data.serial_number}_week_program"
         self._attr_translation_key = "select_week"
         self._attr_current_option = None
         self._attr_entity_category = EntityCategory.CONFIG
@@ -64,7 +57,7 @@ class PluggitSelect(SelectEntity):
         self._attr_options = list(self.OPTIONS.values())
         self._attr_available = False
         self._attr_device_info = DeviceInfo(
-            name="Pluggit", identifiers={(DOMAIN, self._serial_number)}
+            name="Pluggit", identifiers={(DOMAIN, str(data.serial_number))}
         )
 
     def select_option(self, option: str) -> None:
@@ -74,12 +67,12 @@ class PluggitSelect(SelectEntity):
             for program, my_option in self.OPTIONS.items()
             if my_option == option
         ]
-        self._pluggit.set_week_program(number=result[0])
+        self._data.pluggit.set_week_program(number=result[0])
 
     def update(self) -> None:
         """Fetch data for select."""
 
-        result = self._pluggit.get_week_program()
+        result = self._data.pluggit.get_week_program()
         if result is not None:
             self._attr_current_option = self.OPTIONS[result]
             self._attr_available = True

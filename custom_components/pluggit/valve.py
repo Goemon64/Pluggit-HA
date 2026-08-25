@@ -9,8 +9,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import DOMAIN, SERIAL_NUMBER
-from .pypluggit.pluggit import ActiveUnitMode, Pluggit
+from .__init__ import PluggitData
+from .const import DOMAIN
+from .pypluggit.pluggit import ActiveUnitMode
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,14 +22,8 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up valve."""
-    data = hass.data[DOMAIN][entry.entry_id]
-    pluggit: Pluggit = data[DOMAIN]
-    serial_number = data[SERIAL_NUMBER]
 
-    async_add_entities(
-        [PluggitValve(pluggit=pluggit, serial_number=serial_number)],
-        update_before_add=True,
-    )
+    async_add_entities([PluggitValve(data=entry.runtime_data)], update_before_add=True)
 
 
 class PluggitValve(ValveEntity):
@@ -36,13 +31,11 @@ class PluggitValve(ValveEntity):
 
     def __init__(
         self,
-        pluggit: Pluggit,
-        serial_number: int,
+        data: PluggitData,
     ) -> None:
         """Initialise Pluggit valve."""
-        self._pluggit = pluggit
-        self._serial_number = str(serial_number)
-        self._attr_unique_id = f"{serial_number}_manual_bypass"
+        self._data = data
+        self._attr_unique_id = f"{data.serial_number}_manual_bypass"
         self._attr_translation_key = "manual_bypass"
         self._attr_has_entity_name = True
         self._attr_available = False
@@ -54,7 +47,7 @@ class PluggitValve(ValveEntity):
         )
         self._attr_state = None
         self._attr_device_info = DeviceInfo(
-            name="Pluggit", identifiers={(DOMAIN, self._serial_number)}
+            name="Pluggit", identifiers={(DOMAIN, str(data.serial_number))}
         )
 
     @property
@@ -107,18 +100,18 @@ class PluggitValve(ValveEntity):
 
     def open_valve(self) -> None:
         """Open the valve."""
-        self._pluggit.set_unit_mode(ActiveUnitMode.SELECT_MANUAL_BYPASS)
+        self._data.pluggit.set_unit_mode(ActiveUnitMode.SELECT_MANUAL_BYPASS)
 
     def close_valve(self) -> None:
         """Close valve."""
-        self._pluggit.set_unit_mode(ActiveUnitMode.DESELECT_MANUAL_BYPASS)
+        self._data.pluggit.set_unit_mode(ActiveUnitMode.DESELECT_MANUAL_BYPASS)
 
     def update(self) -> None:
         """Fetch data for valve."""
         # If the switch is pressed, there is an update for the status, but this update is to fast. So we wait here.
         time.sleep(200 / 1000)
 
-        result = self._pluggit.get_bypass_actual_state()
+        result = self._data.pluggit.get_bypass_actual_state()
         if result is not None:
             self._attr_state = self.get_valve_state(result)
             self._attr_available = True
