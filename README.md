@@ -15,7 +15,7 @@ This integration allows you to control and monitor your Pluggit AP190, AP310 and
 3. Enter the following repository URL `https://github.com/Goemon64/Pluggit-HA`, select "Integration" and click "Add"
 4. Search for Pluggit in the search field, select it and click download
 5. Restart Home Assistant
-6. Add a new integraion with the "+" button and search after "Pluggit" and select it
+6. Add a new integration with the "+" button and search after "Pluggit" and select it
 7. Now enter the ip address of your Pluggit device
 
 Note: Integration is tested with AP310 and Firmware 3.14
